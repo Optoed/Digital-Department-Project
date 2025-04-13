@@ -3,7 +3,9 @@ package repository
 
 import (
 	"backend/internal/models"
+	"fmt"
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/crypto/bcrypt"
 	"log"
 	"math/rand"
 )
@@ -17,18 +19,29 @@ func NewCourierRepo(db *sqlx.DB) *CourierRepo {
 }
 
 func (r *CourierRepo) Create(courier *models.Courier) (uint, error) {
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(courier.Password), bcrypt.DefaultCost)
+	if err != nil {
+		log.Println("Ошибка хеширования пароля:", err)
+		return 0, err
+	}
+
+	courier.Password = string(hashPassword)
+
 	query := `
-		INSERT INTO couriers (name, surname, transport, email, phone, rating, is_available)
-		VALUES (:name, :surname, :transport, :email, :phone, :rating, :is_available)
+		INSERT INTO couriers (name, surname, transport, email, phone, rating, is_available, password)
+		VALUES (:name, :surname, :transport, :email, :phone, :rating, :is_available, :password)
 		RETURNING id
 	`
 
 	stmt, err := r.db.PrepareNamed(query)
+	log.Println("err = ", err)
 	if err != nil {
 		return 0, err
 	}
 
 	err = stmt.Get(&courier.ID, courier)
+	log.Println("err = ", err)
+	log.Println("courierID = ", courier.ID)
 	if err != nil {
 		return 0, err
 	}
@@ -49,7 +62,7 @@ func (r *CourierRepo) GetByEmail(email string) (*models.Courier, error) {
 	var courier models.Courier
 	err := r.db.Get(&courier, `SELECT * FROM couriers WHERE email = $1`, email)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("no users with such email")
 	}
 	return &courier, nil
 }

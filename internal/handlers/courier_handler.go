@@ -28,6 +28,16 @@ func (h *CourierHandler) CourierRoutes(api fiber.Router) {
 }
 
 // Register - регистрация курьера
+// @Summary Register a new courier
+// @Description This endpoint allows you to register a new courier
+// @Tags courier
+// @Accept json
+// @Produce json
+// @Param courier body models.Courier true "Courier registration data"
+// @Success 201 {object} fiber.Map{"id": uint} "Courier successfully registered"
+// @Failure 400 {object} fiber.Map{"error": string} "Invalid request body"
+// @Failure 500 {object} fiber.Map{"error": string} "Failed to register courier"
+// @Router /courier/register [post]
 func (h *CourierHandler) Register(c *fiber.Ctx) error {
 	var courier models.Courier
 	if err := c.BodyParser(&courier); err != nil {
@@ -44,11 +54,21 @@ func (h *CourierHandler) Register(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-		"id": id,
+		"courier_id": id,
 	})
 }
 
 // Login - авторизация курьера
+// @Summary Courier login
+// @Description This endpoint allows a courier to log in
+// @Tags courier
+// @Accept json
+// @Produce json
+// @Param loginRequest body struct {Email string `json:"email"`; Password string `json:"password"`} true "Login credentials"
+// @Success 200 {object} fiber.Map{"message": string, "token": string} "Login successful"
+// @Failure 400 {object} fiber.Map{"error": string} "Invalid request body"
+// @Failure 401 {object} fiber.Map{"error": string} "Invalid credentials"
+// @Router /courier/login [post]
 func (h *CourierHandler) Login(c *fiber.Ctx) error {
 	// Пример авторизации (например, проверка email/phone и пароля)
 	var loginRequest struct {
@@ -74,6 +94,16 @@ func (h *CourierHandler) Login(c *fiber.Ctx) error {
 }
 
 // TakeOrder - курьер берет заказ
+// @Summary Courier takes an order
+// @Description This endpoint allows a courier to take an order
+// @Tags courier
+// @Accept json
+// @Produce json
+// @Param orderRequest body struct {CourierID uint `json:"courier_id"`; OrderID uint `json:"order_id"`} true "Order data"
+// @Success 200 {object} fiber.Map{"message": string} "Order taken successfully"
+// @Failure 400 {object} fiber.Map{"error": string} "Invalid request body"
+// @Failure 500 {object} fiber.Map{"error": string} "Failed to take order"
+// @Router /secure/take_order [post]
 func (h *CourierHandler) TakeOrder(c *fiber.Ctx) error {
 	var orderRequest struct {
 		CourierID uint `json:"courier_id"`
@@ -99,6 +129,16 @@ func (h *CourierHandler) TakeOrder(c *fiber.Ctx) error {
 }
 
 // FinishDelivery - завершение доставки
+// @Summary Finish delivery
+// @Description This endpoint allows a courier to finish a delivery
+// @Tags courier
+// @Accept json
+// @Produce json
+// @Param deliveryRequest body struct {CourierID uint `json:"courier_id"`; OrderID uint `json:"order_id"`} true "Delivery data"
+// @Success 200 {object} fiber.Map{"message": string} "Delivery finished successfully"
+// @Failure 400 {object} fiber.Map{"error": string} "Invalid request body"
+// @Failure 500 {object} fiber.Map{"error": string} "Failed to finish delivery"
+// @Router /secure/finish_delivery [post]
 func (h *CourierHandler) FinishDelivery(c *fiber.Ctx) error {
 	var deliveryRequest struct {
 		CourierID uint `json:"courier_id"`
@@ -124,6 +164,17 @@ func (h *CourierHandler) FinishDelivery(c *fiber.Ctx) error {
 }
 
 // GetShortestDirections - получение кратчайшего маршрута
+// @Summary Get shortest directions for a courier
+// @Description This endpoint returns the shortest route for a courier to complete a delivery
+// @Tags courier
+// @Accept json
+// @Produce json
+// @Param courier_id query int true "Courier ID"
+// @Param order_id query int true "Order ID"
+// @Success 200 {object} fiber.Map{"directions": string} "Directions retrieved successfully"
+// @Failure 400 {object} fiber.Map{"error": string} "Invalid request parameters"
+// @Failure 500 {object} fiber.Map{"error": string} "Failed to get directions"
+// @Router /secure/get_directions [get]
 func (h *CourierHandler) GetShortestDirections(c *fiber.Ctx) error {
 	courierIDstr := c.Query("courier_id")
 	courierID, err := strconv.Atoi(courierIDstr)
@@ -156,6 +207,16 @@ func (h *CourierHandler) GetShortestDirections(c *fiber.Ctx) error {
 }
 
 // Rate - оценка курьера
+// @Summary Rate a courier
+// @Description This endpoint allows a customer to rate a courier
+// @Tags courier
+// @Accept json
+// @Produce json
+// @Param ratingRequest body struct {CourierID uint `json:"courier_id"`; Rating float64 `json:"rating"`} true "Rating data"
+// @Success 200 {object} fiber.Map{"message": string} "Courier rated successfully"
+// @Failure 400 {object} fiber.Map{"error": string} "Invalid request body"
+// @Failure 500 {object} fiber.Map{"error": string} "Failed to rate courier"
+// @Router /secure/rate [post]
 func (h *CourierHandler) Rate(c *fiber.Ctx) error {
 	var ratingRequest struct {
 		CourierID uint    `json:"courier_id"`

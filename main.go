@@ -6,15 +6,23 @@ import (
 	"backend/internal/repository"
 	"backend/internal/services"
 	"backend/internal/utils"
-	"log"
-	"os"
-
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/swagger"
+	fiberSwagger "github.com/swaggo/fiber-swagger"
+	"log"
+	"os"
+	// указываем путь к сгенерированным Swagger docs
+	// _ "backend/docs"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	// Загружаем переменные окружения
+	// Загрузка переменных из файла .env
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	port := os.Getenv("PORT")
 	utils.SetJwtSecret()
 
@@ -25,6 +33,9 @@ func main() {
 
 	// Создаем Fiber-приложение
 	app := fiber.New()
+
+	// Роут для Swagger UI
+	app.Get("/swagger/*", fiberSwagger.WrapHandler)
 
 	// Middleware
 	app.Use(logger.New())
@@ -47,6 +58,9 @@ func main() {
 
 	orderApi := api.Group("/order")
 	orderHandler.OrderRoutes(orderApi)
+
+	// Настроить Swagger
+	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	// Запуск
 	log.Printf("Сервер запущен на порту %s", port)

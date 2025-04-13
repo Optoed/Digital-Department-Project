@@ -15,9 +15,20 @@ func NewOrderHandler(service *services.OrderService) *OrderHandler {
 }
 
 func (h *OrderHandler) OrderRoutes(api fiber.Router) {
-	api.Post("/register/", h.CreateOrder)
+	api.Post("/create/", h.CreateOrder)
 }
 
+// CreateOrder - создание заказа
+// @Summary Create a new order
+// @Description This endpoint allows you to create a new order
+// @Tags order
+// @Accept json
+// @Produce json
+// @Param order body models.Order true "Order creation data"
+// @Success 201 {object} fiber.Map{"message": string, "order_id": uint} "Order successfully created"
+// @Failure 400 {object} fiber.Map{"error": string} "Invalid request format"
+// @Failure 500 {object} fiber.Map{"error": string} "Failed to create order"
+// @Router /order/register [post]
 func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
 	var input models.Order
 
