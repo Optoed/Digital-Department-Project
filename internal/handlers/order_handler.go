@@ -1,6 +1,17 @@
 package handlers
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"backend/internal/services"
+	"github.com/gofiber/fiber/v2"
+)
+
+type OrderHandler struct {
+	service *services.OrderService
+}
+
+func NewOrderHandler(service *services.OrderService) *OrderHandler {
+	return &CourierHandler{service: service}
+}
 
 func OrderRoutes(api fiber.Router) {
 	api.Post("/order/", OrderRegister)

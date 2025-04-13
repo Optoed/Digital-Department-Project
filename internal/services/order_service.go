@@ -1,8 +1,11 @@
 package services
 
-import "backend/internal/models"
+import "backend/internal/repository"
 
-// TODO
-func CalculateOrderCost(order *models.Order) int {
-	return 0
+type OrderService struct {
+	repo *repository.OrderRepo
+}
+
+func NewOrderService(repo *repository.OrderRepo) *OrderService {
+	return &OrderService{repo: repo}
 }
