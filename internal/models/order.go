@@ -1,23 +1,27 @@
+// models/order.go
 package models
 
 import "time"
 
-// Status constants for Order status
+type OrderStatus string
+
 const (
-	Created   = "created"
-	InTransit = "in_transit"
-	Delivered = "delivered"
-	Canceled  = "canceled"
+	Created   OrderStatus = "created"
+	InTransit OrderStatus = "in_transit"
+	Delivered OrderStatus = "delivered"
+	Canceled  OrderStatus = "canceled"
 )
 
 type Order struct {
-	ID              int        `json:"id"`
-	Status          string     `json:"status"`
-	SenderID        int        `json:"sender_id"`
-	Receiver        string     `json:"receiver"`
-	Cost            int        `json:"cost"`
-	CourierID       int        `json:"courier_id"`
-	AssignedCourier *Courier   `json:"assigned_courier,omitempty"`
-	CreatedAt       time.Time  `json:"created_at"`
-	UpdatedAt       *time.Time `json:"updated_at,omitempty"`
+	ID            uint        `db:"id" json:"id"`
+	CourierID     *uint       `db:"courier_id" json:"courier_id"`
+	Status        OrderStatus `db:"status" json:"status"`
+	ReceiverName  string      `db:"receiver_name" json:"receiver_name"`
+	ReceiverPhone string      `db:"receiver_phone" json:"receiver_phone"`
+	AddressFrom   string      `db:"address_from" json:"address_from"`
+	AddressTo     string      `db:"address_to" json:"address_to"`
+	Cost          int         `db:"cost" json:"cost"`
+	CreatedAt     time.Time   `db:"created_at" json:"created_at"`
+	AssignedAt    *time.Time  `db:"assigned_at" json:"assigned_at"`
+	FinishedAt    *time.Time  `db:"finished_at" json:"finished_at"`
 }
