@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"backend/internal/models"
 	"backend/internal/services"
 	"github.com/gofiber/fiber/v2"
 )
@@ -10,24 +11,31 @@ type OrderHandler struct {
 }
 
 func NewOrderHandler(service *services.OrderService) *OrderHandler {
-	return &CourierHandler{service: service}
+	return &OrderHandler{service: service}
 }
 
-func OrderRoutes(api fiber.Router) {
-	api.Post("/order/", OrderRegister)
+func (h *OrderHandler) OrderRoutes(api fiber.Router) {
+	api.Post("/register/", h.CreateOrder)
 }
 
-// TODO
-func OrderRegister(c *fiber.Ctx) error {
-	return nil
-}
+func (h *OrderHandler) CreateOrder(c *fiber.Ctx) error {
+	var input models.Order
 
-// TODO
-func OrderGetCoordinates(c *fiber.Ctx) {
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "неверный формат запроса",
+		})
+	}
 
-}
+	orderID, err := h.service.Create(&input)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "не удалось создать заказ",
+		})
+	}
 
-// TODO
-func OrderPayCost(c fiber.Ctx) {
-
+	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
+		"message":  "заказ успешно создан",
+		"order_id": orderID,
+	})
 }

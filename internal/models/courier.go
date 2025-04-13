@@ -22,4 +22,5 @@ type Courier struct {
 	CurrentOrderID *uint         `db:"current_order_id" json:"current_order_id,omitempty"`
 	IsAvailable    bool          `db:"is_available" json:"is_available"`
 	CreatedAt      time.Time     `db:"created_at" json:"created_at"`
+	Password       string        `db:"password" json:"password"`
 }
